@@ -1,98 +1,130 @@
 <!--
 SYNC IMPACT REPORT
-Version change: (uninitialized template) → 1.0.0
-Bump rationale: Initial ratification — all placeholders replaced with concrete content.
-Modified principles: none (first ratification)
+Version change: 1.0.0 → 2.0.0
+Bump rationale: MAJOR — principles redefined for the project's true scope (public-data
+  visualization site with email reports), replacing the placeholder personal-homepage
+  principles that were drafted before requirements were elicited.
+Modified principles:
+  - I. Static-First (No Build Toolchain) — kept, scope clarified ("zero build deps", CDN allowed)
+  - II. Accessibility by Default → REMOVED from core (folded into Quality Standards section)
+  - III. Progressive Enhancement (No-JS Baseline) → REMOVED (JS is required for charts)
+  - IV. Responsive & Mobile-Friendly → REMOVED from core (folded into Quality Standards)
+  - V. Visual & Stylistic Consistency → REMOVED from core (folded into Quality Standards)
 Added principles:
-  - I. Static-First (No Build Toolchain)
-  - II. Accessibility by Default
-  - III. Progressive Enhancement (No-JS Baseline)
-  - IV. Responsive & Mobile-Friendly
-  - V. Visual & Stylistic Consistency
+  - II. Public Data via Runtime API Fetch
+  - III. Email Reports via Third-Party Form Service
+  - IV. Charting via CDN (No Bundlers)
+  - V. Spec-First for New Features
 Added sections:
-  - Technical Constraints
-  - Development Workflow
-  - Governance
-Removed sections: none
+  - Quality Standards (accessibility, responsiveness, visual consistency)
+Removed sections: none (Technical Constraints + Development Workflow + Governance retained)
 Templates requiring updates:
-  - ✅ .specify/templates/plan-template.md (verified — "Constitution Check" gate is generic and compatible)
-  - ✅ .specify/templates/spec-template.md (verified — no constitution-specific sections required)
-  - ✅ .specify/templates/tasks-template.md (verified — no principle-driven task categories need adjustment)
-  - ⚠ .specify/templates/commands/ — directory not present in this project; no command files to update
-  - ✅ CLAUDE.md (no principle references; defers to current plan)
+  - ✅ .specify/templates/plan-template.md (generic Constitution Check gate remains valid)
+  - ✅ .specify/templates/spec-template.md (no changes required)
+  - ✅ .specify/templates/tasks-template.md (no principle-driven category changes)
+  - ⚠ .specify/templates/commands/ — directory not present in this project; nothing to update
+  - ✅ CLAUDE.md (no principle references; defers to active plan)
 Deferred TODOs: none
 -->
 
-# Personal Homepage Constitution
+# Donnees de la Population Visualisées Constitution
 
 ## Core Principles
 
 ### I. Static-First (No Build Toolchain)
 
-The site MUST remain a set of plain static files (HTML, CSS, optional images) servable
-directly from GitHub Pages or any static host. No build steps, bundlers, transpilers,
-package managers, or server-side runtimes may be introduced. Rationale: keeps the
-project trivial to clone, host, and maintain by a non-developer owner; eliminates
-toolchain rot.
+The site MUST remain a set of plain static files (HTML, CSS, JS, optional images)
+servable directly from GitHub Pages. No build steps, bundlers, transpilers,
+package managers, lockfiles, or server-side runtimes may be introduced. "Zero
+build dependencies" means no `package.json`, no `npm install`, no `yarn`, no
+webpack/vite/rollup. Runtime scripts MAY be loaded from CDNs (see Principle IV).
+Rationale: keeps the project trivial to clone, host, and maintain; eliminates
+toolchain rot for a non-developer maintainer.
 
-### II. Accessibility by Default
+### II. Public Data via Runtime API Fetch
 
-All interactive and informational elements MUST be usable with a keyboard, with
-assistive technologies, and with sufficient colour contrast. Links and buttons MUST
-have descriptive text (icons alone are not sufficient), touch targets MUST be at
-least 44×44 px, and semantic HTML elements (`<header>`, `<main>`, `<section>`,
-`<nav>`, headings in order) MUST be used over generic `<div>` wrappers. Rationale:
-a personal page is a public front door; it must work for every visitor.
+All visualised data MUST be fetched at runtime from a publicly accessible HTTP
+API using the browser's `fetch` API. Data files MUST NOT be bundled into the
+repo as a substitute for the live source. Every API call MUST handle the loading
+state, the empty/no-result state, and the error state explicitly in the UI.
+Rationale: keeps the site authoritative and current without manual data updates,
+and ensures users always see the freshest population data.
 
-### III. Progressive Enhancement (No-JS Baseline)
+### III. Email Reports via Third-Party Form Service
 
-Every feature MUST function with HTML and CSS alone. JavaScript MAY be added only
-as a non-essential enhancement, and the page MUST remain fully usable when JS is
-disabled or fails to load. Rationale: guarantees resilience, performance, and
-privacy — and keeps the project aligned with Principle I.
+Email reports MUST be sent via a third-party form service (e.g., Formspree,
+EmailJS, Web3Forms) configured to deliver to the owner's address. The site MUST
+NOT ship credentials or SMTP secrets, and MUST NOT attempt to send mail from
+client-side code outside such a service. The chosen service MUST be reachable
+without authentication from the browser, and the form MUST display submission
+success and failure clearly to the user. Rationale: GitHub Pages cannot run
+server code; this is the only safe, maintainable path for outbound email.
 
-### IV. Responsive & Mobile-Friendly
+### IV. Charting via CDN (No Bundlers)
 
-Layouts MUST render legibly and without horizontal scrolling at viewport widths
-from 320 px to 1440 px. Media queries, fluid units (`rem`, `%`, `vw`), and
-flex/grid layouts SHOULD be preferred over fixed pixel layouts. Rationale: the
-majority of visitors arrive on mobile devices.
+Chart and visualization libraries (e.g., Chart.js, D3, Plotly) MUST be loaded
+from a public CDN via `<script>` tags pinned to a specific version (no
+floating `@latest`). Self-hosting a library file in the repo is also acceptable.
+Adding a build step or package manager to install a charting library is
+forbidden (see Principle I). Rationale: lets the site use mature visualization
+tools without compromising the static-first constraint.
 
-### V. Visual & Stylistic Consistency
+### V. Spec-First for New Features
 
-New sections MUST reuse the existing palette, typography, spacing scale, and
-component idioms (e.g., pill-shaped links, gradient background) defined in
-`style.css`. Introducing a new colour, font, or layout primitive requires
-explicit justification in the feature plan. Rationale: a personal site reads as
-trustworthy when its visual language is coherent.
+Every new user-facing feature MUST start with a `spec.md` under
+`specs/<NNN>-<slug>/`, followed by a `plan.md` (with a Constitution Check) and a
+`tasks.md`, generated via the Spec Kit slash commands. Small fixes (typos,
+copy edits, single-rule CSS tweaks, dependency version bumps) MAY be committed
+directly without a spec. When in doubt, write the spec. Rationale: aligns the
+team on intent before implementation while not adding ceremony to trivial work.
 
 ## Technical Constraints
 
-- **Hosting**: GitHub Pages (or equivalent static host). No server-side code.
-- **Files**: Source lives at the repo root (`index.html`, `style.css`, plus any
-  asset folders). Feature work MUST prefer additive edits to these files over
-  creating parallel copies.
-- **Dependencies**: Zero runtime dependencies. External assets (fonts, icons)
-  MUST be inlined or self-hosted to avoid third-party tracking and outages.
+- **Hosting**: GitHub Pages. No server-side code, no edge functions.
+- **Build**: None. Source files at the repo root are served as-is.
+- **Runtime dependencies**: External CDN scripts and the third-party form
+  service are permitted; no other external services may be introduced without
+  an amendment to this constitution.
+- **Secrets**: No API keys or tokens may be committed to the repo or embedded
+  in client-side code. If an API requires a key, choose a different API.
 - **Browser support**: Latest two stable versions of Chrome, Firefox, Safari,
-  and Edge. Graceful degradation on older browsers is acceptable.
-- **Performance**: Initial page load MUST stay under 1 second on a standard
-  broadband connection; total page weight SHOULD remain under 200 KB.
+  and Edge.
+- **Performance**: Initial render (excluding chart data fetch) MUST stay under
+  2 seconds on a standard broadband connection.
+
+## Quality Standards
+
+These standards apply to every feature and are verified during plan and
+implementation reviews:
+
+- **Accessibility**: Semantic HTML elements, keyboard-operable controls,
+  descriptive link/button text, sufficient colour contrast, and touch targets
+  of at least 44×44 px. Charts MUST expose an accessible alternative (data
+  table, ARIA label summary, or downloadable CSV) for screen-reader users.
+- **Responsiveness**: Layouts MUST render legibly without horizontal scrolling
+  from 320 px to 1440 px viewport width.
+- **Visual consistency**: New sections MUST reuse the existing palette,
+  typography, and spacing scale defined in `style.css`. Introducing a new
+  primitive requires explicit justification in the feature plan.
+- **Customization persistence**: User display preferences (chart type, filters,
+  etc.) SHOULD persist across reloads via `localStorage` unless the feature
+  spec explicitly opts out.
 
 ## Development Workflow
 
-- **Spec-driven**: Each feature MUST start with a `spec.md` under
-  `specs/<NNN>-<slug>/`, followed by `plan.md` and `tasks.md`, generated via the
-  Spec Kit slash commands.
-- **Constitution Check**: The `plan.md` "Constitution Check" section MUST
-  explicitly confirm compliance with each principle above (or document an
-  approved exception in the Complexity Tracking section).
+- **Spec-driven** (per Principle V): features go through spec → plan → tasks
+  before implementation. Spec Kit auto-commit hooks (`speckit.git.commit`) MAY
+  be used between phases.
 - **Manual verification**: Because there is no automated test suite, every
-  change MUST be visually verified at 320 px, 768 px, and 1440 px viewport
-  widths, and with the keyboard alone, before being marked complete.
-- **Commits**: Use small, descriptive commits per task. Spec Kit auto-commit
-  hooks (`speckit.git.commit`) MAY be used to keep history aligned with
-  workflow phases.
+  change MUST be visually verified in at least one mobile viewport (≤ 480 px)
+  and one desktop viewport (≥ 1024 px), and with the keyboard alone, before
+  being marked complete.
+- **API contract checks**: Any change touching the data-fetch layer MUST be
+  verified against the live API (or a recorded sample) and document the
+  expected response shape in the feature plan.
+- **Form delivery checks**: Any change touching the email-report flow MUST be
+  end-to-end tested by submitting a real test message and confirming
+  receipt.
 
 ## Governance
 
@@ -113,4 +145,4 @@ violation MUST be either resolved or recorded — with justification — in the
 plan's Complexity Tracking section. Runtime guidance for contributors and
 agents lives in `CLAUDE.md` and the active feature `plan.md`.
 
-**Version**: 1.0.0 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-05-06
+**Version**: 2.0.0 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-05-06
